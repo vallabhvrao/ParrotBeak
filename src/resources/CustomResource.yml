@@ -1,0 +1,25 @@
+CustomCfnContactFlowPublish: &default
+  Type: 'Custom::ConnectFlow'
+  DependsOn: 
+    - ContactFlowPublish
+  Properties:
+    ServiceToken: !GetAtt ContactFlowPublish.Arn
+    # TestKey: 'test-abcd'
+    # Data:
+    #   identityPoolId: !Ref IdentityPool
+    #   providerName: !GetAtt UserPool.ProviderName
+    #   authenticated: !GetAtt IamAuthenticatedRole.Arn
+    #   unauthenticated: !GetAtt IamUnauthenticatedRole.Arn
+    #   clientId: !Ref UserPoolClient
+
+
+dev:
+  <<: *default
+
+
+prod: &prod_anchor
+  <<: *default
+
+
+staging: 
+  <<: *prod_anchor

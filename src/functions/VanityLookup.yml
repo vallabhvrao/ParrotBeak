@@ -1,0 +1,40 @@
+VanityLookup: &default
+  handler: build/functions/vanityLookup.handler
+  memorySize: 1024
+  timeout: 30
+  # layers: 
+  #   - arn:aws:lambda:ap-south-1:483954538571:layer:AwsSdk:10
+  environment:
+    STAGE: ${self:custom.stage}
+    DB_TABLE_NAME: ${self:custom.secrets.DYNAMODB_NAME}
+    S3_DATA_BUCKET: ${self:custom.secrets.S3_DATA_BUCKET}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - dynamodb:PutItem
+      Resource:
+        - ${self:custom.secrets.DYNAMODB_ARN}
+    - Effect: Allow
+      Action: 
+        - s3:*
+      Resource:
+        - ${self:custom.secrets.S3_DATA_ARN}
+        - ${self:custom.secrets.S3_DATA_ARN}/*
+        - ${self:custom.secrets.S3_DATA_ARN}/public
+    - Effect: Allow
+      Action: 
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource: "*"
+
+dev: 
+  <<: *default
+
+
+prod: &prod 
+  <<: *default
+
+
+staging: 
+  <<: *prod

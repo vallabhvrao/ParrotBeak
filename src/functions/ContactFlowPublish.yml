@@ -1,0 +1,36 @@
+
+####################### Defaults ################################
+defaults: &default_anchor
+  handler: build/functions/contactFlowPublish.handler
+  memorySize: 256
+  timeout: 10
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - connect:*
+      Resource:
+        - arn:aws:connect:eu-west-2:012700660634:instance/bef6f726-7fce-457f-9083-d8786ac92154
+  environment:
+    STAGE: ${self:custom.stage}
+#################################################################
+
+
+
+########################## Development ##########################
+dev: 
+  <<: *default_anchor
+#################################################################
+
+
+
+########################### Production ##########################
+prod: &prod_anchor
+  <<: *default_anchor
+#################################################################
+
+
+
+########################## Staging ##############################
+staging: 
+  <<: *prod_anchor
+#################################################################

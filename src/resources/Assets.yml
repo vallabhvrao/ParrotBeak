@@ -1,0 +1,48 @@
+
+S3ParrotBeakDataBucket: &default
+  Type: AWS::S3::Bucket
+  Properties:
+    # BucketName: ${self:custom.secrets.S3_DATA_BUCKET}
+    # AccessControl: PublicRead
+    CorsConfiguration:
+      CorsRules:
+        - AllowedOrigins:
+            - '*'
+          AllowedHeaders:
+            - '*'
+          AllowedMethods:
+            - GET
+            - PUT
+            - POST
+            - DELETE
+            - HEAD
+          MaxAge: 3000
+
+# S3ParrotBeakDataBucketPolicy:
+#   Type: 'AWS::S3::BucketPolicy'
+#   Properties:
+#     PolicyDocument:
+#       Statement:
+#         - Sid: PublicReadForGetBucketObjects
+#           Effect: Allow
+#           Principal: '*'
+#           Action:
+#             - 's3:GetObject'
+#           Resource: ${self:custom.secrets.S3_DATA_ARN}/public/*
+#     Bucket:
+#           Ref: S3ParrotBeakDataBucket
+
+
+
+dev:
+  <<: *default
+
+
+
+prod: &prod_anchor
+  <<: *default
+
+
+
+staging: 
+  <<: *prod_anchor

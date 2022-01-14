@@ -1,0 +1,684 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "GenerateVanityObjLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/parrot-beak-dev-GenerateVanityObj"
+      }
+    },
+    "VanityLookupLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/parrot-beak-dev-VanityLookup"
+      }
+    },
+    "ContactFlowPublishLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/parrot-beak-dev-ContactFlowPublish"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "parrot-beak",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/parrot-beak-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/parrot-beak-dev*:*:*"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "parrot-beak",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "GenerateVanityObjLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/parrot-beak/dev/1642194846855-2022-01-14T21:14:06.855Z/parrot-beak.zip"
+        },
+        "Handler": "build/functions/generateVanityObj.handler",
+        "Runtime": "nodejs14.x",
+        "FunctionName": "parrot-beak-dev-GenerateVanityObj",
+        "MemorySize": 1024,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "NODE_PATH": "./:/opt/node_modules",
+            "STAGE": "dev",
+            "DB_TABLE_NAME": {
+              "Ref": "DynamoDb"
+            },
+            "S3_DATA_BUCKET": "parrot-beak-dev-assets-1phtahiy9hm01"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "GenerateVanityObjIamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "GenerateVanityObjIamRoleLambdaExecution",
+        "GenerateVanityObjLogGroup"
+      ]
+    },
+    "VanityLookupLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/parrot-beak/dev/1642194846855-2022-01-14T21:14:06.855Z/parrot-beak.zip"
+        },
+        "Handler": "build/functions/vanityLookup.handler",
+        "Runtime": "nodejs14.x",
+        "FunctionName": "parrot-beak-dev-VanityLookup",
+        "MemorySize": 1024,
+        "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "NODE_PATH": "./:/opt/node_modules",
+            "STAGE": "dev",
+            "DB_TABLE_NAME": {
+              "Ref": "DynamoDb"
+            },
+            "S3_DATA_BUCKET": "parrot-beak-dev-assets-1phtahiy9hm01"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "VanityLookupIamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "VanityLookupIamRoleLambdaExecution",
+        "VanityLookupLogGroup"
+      ]
+    },
+    "ContactFlowPublishLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/parrot-beak/dev/1642194846855-2022-01-14T21:14:06.855Z/parrot-beak.zip"
+        },
+        "Handler": "build/functions/contactFlowPublish.handler",
+        "Runtime": "nodejs14.x",
+        "FunctionName": "parrot-beak-dev-ContactFlowPublish",
+        "MemorySize": 256,
+        "Timeout": 10,
+        "Environment": {
+          "Variables": {
+            "NODE_PATH": "./:/opt/node_modules",
+            "STAGE": "dev"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "ContactFlowPublishIamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ContactFlowPublishIamRoleLambdaExecution",
+        "ContactFlowPublishLogGroup"
+      ]
+    },
+    "GenerateVanityObjLambdaVersionNI9Z1Y740EUTMTpo1tsAdfUjM3vEDMSDMlIyTyulk": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GenerateVanityObjLambdaFunction"
+        },
+        "CodeSha256": "Vj7RQMovOyWIsQse2jg7XRnyMQDnphPfIID17Z+LWew="
+      }
+    },
+    "VanityLookupLambdaVersion9GxATaWRs1rW9PiSxXTJeV29b4PLxCuptM6INopi69w": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "VanityLookupLambdaFunction"
+        },
+        "CodeSha256": "Vj7RQMovOyWIsQse2jg7XRnyMQDnphPfIID17Z+LWew="
+      }
+    },
+    "ContactFlowPublishLambdaVersionwIAjweLtkkKvn8R2dAJonQvR2LLGVr6wdw8pjx4I": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ContactFlowPublishLambdaFunction"
+        },
+        "CodeSha256": "Vj7RQMovOyWIsQse2jg7XRnyMQDnphPfIID17Z+LWew="
+      }
+    },
+    "GenerateVanityObjIamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "parrot-beak",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/parrot-beak-dev-GenerateVanityObj:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:PutItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "DynamoDb",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::parrot-beak-dev-assets-1phtahiy9hm01/*",
+                    "arn:aws:s3:::parrot-beak-dev-assets-1phtahiy9hm01"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:AddPermission"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "parrot-beak",
+              "dev",
+              "GenerateVanityObj",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        },
+        "ManagedPolicyArns": []
+      }
+    },
+    "VanityLookupIamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "parrot-beak",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/parrot-beak-dev-VanityLookup:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:PutItem"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "DynamoDb",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::parrot-beak-dev-assets-1phtahiy9hm01",
+                    "arn:aws:s3:::parrot-beak-dev-assets-1phtahiy9hm01/*",
+                    "arn:aws:s3:::parrot-beak-dev-assets-1phtahiy9hm01/public"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction",
+                    "lambda:InvokeAsync"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "parrot-beak",
+              "dev",
+              "VanityLookup",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        },
+        "ManagedPolicyArns": []
+      }
+    },
+    "ContactFlowPublishIamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "parrot-beak",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/parrot-beak-dev-ContactFlowPublish:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "connect:*"
+                  ],
+                  "Resource": "arn:aws:connect:eu-west-2:012700660634:instance/bef6f726-7fce-457f-9083-d8786ac92154"
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "parrot-beak",
+              "dev",
+              "ContactFlowPublish",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        },
+        "ManagedPolicyArns": []
+      }
+    },
+    "DynamoDb": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "HashKey",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "RangeKey",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "HashKey",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "RangeKey",
+            "KeyType": "RANGE"
+          }
+        ],
+        "BillingMode": "PAY_PER_REQUEST"
+      }
+    },
+    "Assets": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "CorsConfiguration": {
+          "CorsRules": [
+            {
+              "AllowedOrigins": [
+                "*"
+              ],
+              "AllowedHeaders": [
+                "*"
+              ],
+              "AllowedMethods": [
+                "GET",
+                "PUT",
+                "POST",
+                "DELETE",
+                "HEAD"
+              ],
+              "MaxAge": 3000
+            }
+          ]
+        }
+      }
+    },
+    "CustomResource": {
+      "Type": "Custom::ConnectFlow",
+      "DependsOn": [
+        "ContactFlowPublish"
+      ],
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "ContactFlowPublish",
+            "Arn"
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-parrot-beak-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "GenerateVanityObjLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GenerateVanityObjLambdaVersionNI9Z1Y740EUTMTpo1tsAdfUjM3vEDMSDMlIyTyulk"
+      },
+      "Export": {
+        "Name": "sls-parrot-beak-dev-GenerateVanityObjLambdaFunctionQualifiedArn"
+      }
+    },
+    "VanityLookupLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "VanityLookupLambdaVersion9GxATaWRs1rW9PiSxXTJeV29b4PLxCuptM6INopi69w"
+      },
+      "Export": {
+        "Name": "sls-parrot-beak-dev-VanityLookupLambdaFunctionQualifiedArn"
+      }
+    },
+    "ContactFlowPublishLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ContactFlowPublishLambdaVersionwIAjweLtkkKvn8R2dAJonQvR2LLGVr6wdw8pjx4I"
+      },
+      "Export": {
+        "Name": "sls-parrot-beak-dev-ContactFlowPublishLambdaFunctionQualifiedArn"
+      }
+    }
+  }
+}

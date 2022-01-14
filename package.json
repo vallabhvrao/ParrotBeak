@@ -1,0 +1,30 @@
+{
+  "name": "parrot-beak",
+  "version": "1.0.0",
+  "description": "Phone number to vanity number convertor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": "node ./build/generateVanityDict.js",
+    "lookup": "node ./build/vanityLookup.js",
+    "temp": "node ./build/temp.js",
+    "debug": "node ./build/index.js"
+  },
+  "keywords": [
+    "vanity",
+    "number",
+    "phone"
+  ],
+  "author": "Vallabh Rao",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^17.0.8",
+    "serverless-iam-roles-per-function": "^3.2.0-e97ab49"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.178",
+    "aws-sdk": "^2.1056.0",
+    "cfn-response": "^1.0.1",
+    "lodash": "^4.17.21"
+  }
+}

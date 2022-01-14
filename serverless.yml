@@ -1,0 +1,61 @@
+service: parrot-beak
+#app: your-app-name
+#tenant: your-tenant-name
+
+####################################### Plugins ###################################################
+plugins:
+  - serverless-iam-roles-per-function
+  # - serverless-enable-api-logs
+
+###################################################################################################
+
+
+
+###################################### Custom #####################################################
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  secrets: ${file(./secrets.yml):${self:custom.stage} }
+###################################################################################################
+
+
+
+###################################### Core Settings ##############################################
+provider:
+  name: aws
+  runtime: nodejs14.x  
+  profile: aws-parrot-beak # change this to the profile of aws cli you want to upload 
+  # profile: your-aws-cli-profile
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-west-2'} 
+
+  environment:
+    NODE_PATH: "./:/opt/node_modules"
+
+
+package:
+  exclude:
+    - secrets.yml
+###################################################################################################
+
+
+
+####################################### Functions #################################################
+functions:
+
+  GenerateVanityObj: ${file(src/functions/GenerateVanityObj.yml):${self:custom.stage} }
+  VanityLookup: ${file(src/functions/VanityLookup.yml):${self:custom.stage} }
+  # ContactFlowPublish: ${file(src/functions/ContactFlowPublish.yml):${self:custom.stage} }
+  
+
+###################################################################################################
+
+
+
+####################################### Resources #################################################
+resources:
+  Resources:
+    DynamoDb: ${file(src/resources/DynamoDb.yml):${self:custom.stage} }
+    Assets: ${file(src/resources/Assets.yml):${self:custom.stage} }
+    # CustomResource: ${file(src/resources/CustomResource.yml):${self:custom.stage} }
+              
+###################################################################################################

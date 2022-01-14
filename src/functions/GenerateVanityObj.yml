@@ -1,0 +1,39 @@
+SetFoodMenu: &default
+  handler: build/functions/generateVanityObj.handler
+  memorySize: 1024
+  timeout: 30
+
+  environment:
+    STAGE: ${self:custom.stage}
+    DB_TABLE_NAME: ${self:custom.secrets.DYNAMODB_NAME}
+    S3_DATA_BUCKET: ${self:custom.secrets.S3_DATA_BUCKET}
+
+  # set per lambda permission
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - dynamodb:PutItem
+      Resource:
+        - ${self:custom.secrets.DYNAMODB_ARN}
+    - Effect: Allow
+      Action: 
+        - s3:*
+      Resource:
+        - ${self:custom.secrets.S3_DATA_ARN}/*
+        - ${self:custom.secrets.S3_DATA_ARN}
+    - Effect: Allow
+      Action: 
+        - lambda:AddPermission
+      Resource: "*"
+        
+
+dev: 
+  <<: *default
+
+
+prod: &prod 
+  <<: *default
+
+
+staging: 
+  <<: *prod

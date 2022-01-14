@@ -1,0 +1,58 @@
+
+#################################### Default ######################################################
+default_properties: &anchor
+  AttributeDefinitions:
+    - AttributeName: HashKey
+      AttributeType: S
+    - AttributeName: RangeKey
+      AttributeType: S
+  KeySchema:
+    - AttributeName: HashKey
+      KeyType: HASH
+    - AttributeName: RangeKey
+      KeyType: RANGE
+  BillingMode: PAY_PER_REQUEST
+###################################################################################################
+
+
+
+######################################## DEVELOPMENT Only Table ###################################
+dev:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    <<: *anchor
+###################################################################################################
+
+
+
+#################################### PRODUCTION Table #############################################
+prod:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    <<: *anchor
+    PointInTimeRecoverySpecification:
+      PointInTimeRecoveryEnabled: true
+###################################################################################################
+
+
+
+#################################### STAGING Table ################################################
+staging:
+  Type: AWS::DynamoDB::Table
+  Properties: 
+    <<: *anchor
+###################################################################################################
+
+
+datasource:
+  type: AMAZON_DYNAMODB
+  name: dynamodbds
+  config:
+    tableName: ${self:custom.secrets.DYNAMODB_NAME}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:GetItem"
+          - "dynamodb:Query"
+        Resource:
+          - ${self:custom.secrets.DYNAMODB_ARN}

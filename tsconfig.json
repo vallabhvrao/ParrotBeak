@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir":"build",
+  },
+  "include": [
+    "src/*", 
+    "src/functions/vanityLookup.ts",
+    "src/functions/generateVanityObj.ts",
+    "src/functions/contactFlowPublish.ts"
+  ]
+}
