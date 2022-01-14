@@ -69,11 +69,11 @@
 2. setup aws cli profile and update it in the serverless.yml file.
 3. run `npm install` from the root of this directory
 4. run `serverless deploy --staging dev` from the root of this directory
-5. run `aws s3 ls --profile aws-parrot-beak` once the deploy is complete, you should be able to see a bucket created by the name *parrot-beak-dev-assets-xxxxxxxxxxxxx*
+5. run `aws s3 ls --profile your-profile` once the deploy is complete, you should be able to see a bucket created by the name *parrot-beak-dev-assets-xxxxxxxxxxxxx*
 6. go to `secrets.yml` and update the `S3_DATA_BUCKET` attribute with the new bucket name.
 7. redeploy stack by running `serverless deploy --staging dev`
-8. copy files to the bucket `aws s3 sync ../bucket s3://bucket-name --profile aws-parrot-beak`
-9. invoke the *GenerateVanityObj* lambda `aws lambda invoke --function-name parrot-beak-dev-GenerateVanityObj --profile aws-parrot-beak ../invoke.txt`
+8. copy files to the bucket `aws s3 sync ../bucket s3://bucket-name --profile your-profile`
+9. invoke the *GenerateVanityObj* lambda `aws lambda invoke --function-name parrot-beak-dev-GenerateVanityObj --profile your-profile ../invoke.txt`
 10. Create an Amazon Connect instance and claim phone number.
 11. Create an empty contact flow. You can find `Vanity-contact-flow.json` in the root of this directory. Use this file to import the contact flow using the import menu.
 12. Update the Lambda ARN in the contact flow to your Lambda ARN
@@ -81,5 +81,5 @@
 ## For Assessor
 
 1. Use +44 1616053574 (UK number) to test the contact flow in my environment
-2. Navigate to [this](https://parrot-beak-dev-assets-428ihlbjwo51.s3.eu-west-2.amazonaws.com/public) link to view the web page of last 5 caller.
-3. Development automation needs to be bit more contained. this would have been done as part of Custom resource implementation. Ran out of time. Use the steps documented above to deploy in other aws env.
+2. Navigate to [this](https://parrot-beak-dev-assets-428ihlbjwo51.s3.eu-west-2.amazonaws.com/public/index.html) link to view the web page of last 5 caller.
+3. Development automation needs to be bit more contained. this would have been done as part of Custom resource implementation. Ran out of time. Use the steps documented above to deploy in other aws env
