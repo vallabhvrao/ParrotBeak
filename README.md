@@ -40,8 +40,7 @@
 4. Populating the Data Bucket needs to be done manually.
 5. AWS wouldn't let me claim phone numbers for my Amazon Connect instances. Had to reach out the customer support. Shortcut: Created a fresh AWS Account.
 6. Code Reuse not enforced fully, `readObjBucket()` and `writeObjBucket()` functions are duplicated in both the lambdas, this would cause issues in maintaining these functions. OOP can be used to solve this with more time.
-7. Improve structure of the repo. The bucket folder can not be included in this directory as serverless framework does not pay attention to .gitignore hence for smaller and quicker build, the heavy directory had to be kept outside.
-8. Complete the Custom Resource part of the lambda. Partial implimentation at this point. Will be completed in the future.
+7. Complete the Custom Resource part of the lambda. Partial implimentation at this point. Will be completed in the future.
 
 ## Future work
 
@@ -72,8 +71,8 @@
 5. run `aws s3 ls --profile your-profile` once the deploy is complete, you should be able to see a bucket created by the name *parrot-beak-dev-assets-xxxxxxxxxxxxx*
 6. go to `secrets.yml` and update the `S3_DATA_BUCKET` attribute with the new bucket name.
 7. redeploy stack by running `serverless deploy --staging dev`
-8. copy files to the bucket `aws s3 sync ../bucket s3://bucket-name --profile your-profile`
-9. invoke the *GenerateVanityObj* lambda `aws lambda invoke --function-name parrot-beak-dev-GenerateVanityObj --profile your-profile ../invoke.txt`
+8. copy files to the bucket `aws s3 sync ./bucket s3://bucket-name --profile your-profile`
+9. invoke the *GenerateVanityObj* lambda `aws lambda invoke --function-name parrot-beak-dev-GenerateVanityObj --profile your-profile ./invoke.txt`
 10. Create an Amazon Connect instance and claim phone number.
 11. Create an empty contact flow. You can find `Vanity-contact-flow.json` in the root of this directory. Use this file to import the contact flow using the import menu.
 12. Update the Lambda ARN in the contact flow to your Lambda ARN

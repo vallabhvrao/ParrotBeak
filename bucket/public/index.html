@@ -1,0 +1,60 @@
+<h1>Last 5 callers</h1>
+<ol id="phoneNumbers"></ol>
+<script type="text/javascript"> 
+    
+    const ol = document.getElementById('phoneNumbers');
+    const S3RootURL = "https://"+window.location.hostname
+    const url = S3RootURL+'/public/lastcaller.json';
+
+    // Create request object 
+    const request = new Request(url, 
+         { method: 'GET', 
+           headers: new Headers({ 'Content-Type': 'application/json' }) 
+         });
+    // Now use it! 
+
+   fetch(request) 
+   .then(resp => { 
+       return resp.json()
+    })
+    .then(data => {
+		let lastcaller = data.lastcaller;
+        const listPh = document.createDocumentFragment();
+
+        for (let i = lastcaller.length-1; i >= 0 ; i--) {
+            
+            let liPh = document.createElement('li');
+            let h2 = document.createElement('h2');
+            let ul = document.createElement('ul');
+            const list = document.createDocumentFragment();
+
+            for (let j = 0; j < lastcaller[i].vanityNumbers.length; j++) {
+
+                let li = document.createElement('li');
+                let vanity = document.createElement('h3');
+
+                vanity.innerHTML = lastcaller[i].vanityNumbers[j];
+
+                li.appendChild(vanity);
+                list.appendChild(li);
+
+            }
+
+            ul.appendChild(list);
+
+            h2.innerHTML = lastcaller[i].phoneNumber;
+
+            let span = document.createElement('span');
+            span.innerHTML = h2.outerHTML + ul.outerHTML
+
+            liPh.appendChild(span);
+            listPh.appendChild(liPh)            
+        }
+
+        ol.appendChild(listPh);
+    })
+   .catch(err => { 
+        console.error(err);
+    });
+
+</script>
