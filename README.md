@@ -1,5 +1,9 @@
 # Phone number to Vanity number
 
+## Architecture Diagram
+
+![Vanity architecture](architecture.jpg)
+
 ## Logic behind the conversion
 
 1. First, *generateVanityObj* lambda restructures all the words in the English dictionary in a way it is easier to lookup up the vanity words for a phone number. filter out words that are more than 10 character long words (as phone numbers are maxed 10 numbers long, excluding the country extension, this limit might break things when the phone numbers are longer than 10).
