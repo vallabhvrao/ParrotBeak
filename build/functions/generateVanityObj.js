@@ -42,7 +42,7 @@ module.exports.handler = async (event, context) => {
             ]
         };
         await attachS3BucketPolicy(bucket, bucketPolicy);
-        await addInvocationPermission('parrot-beak-dev-VanityLookup', '1');
+        await addInvocationPermission('parrot-beak-' + process.env.STAGE + '-VanityLookup', '1');
         return { message: "Vanity words successfully generated and required permissions for resources are attached." };
     }
     catch (error) {

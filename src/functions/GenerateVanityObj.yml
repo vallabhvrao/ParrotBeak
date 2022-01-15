@@ -19,12 +19,16 @@ SetFoodMenu: &default
       Action: 
         - s3:*
       Resource:
-        - ${self:custom.secrets.S3_DATA_ARN}/*
         - ${self:custom.secrets.S3_DATA_ARN}
+        - !Join
+            - ''
+            - - ${self:custom.secrets.S3_DATA_ARN}
+              - '/*'
+
     - Effect: Allow
       Action: 
         - lambda:AddPermission
-      Resource: "*"
+      Resource: ${self:custom.secrets.LOOKUP_ARN}
         
 
 dev: 

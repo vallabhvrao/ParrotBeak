@@ -1,16 +1,10 @@
 CustomCfnContactFlowPublish: &default
   Type: 'Custom::ConnectFlow'
   DependsOn: 
-    - ContactFlowPublish
+    - VanityLookupLambdaFunction
+    - ContactFlowPublishLambdaFunction
   Properties:
-    ServiceToken: !GetAtt ContactFlowPublish.Arn
-    # TestKey: 'test-abcd'
-    # Data:
-    #   identityPoolId: !Ref IdentityPool
-    #   providerName: !GetAtt UserPool.ProviderName
-    #   authenticated: !GetAtt IamAuthenticatedRole.Arn
-    #   unauthenticated: !GetAtt IamUnauthenticatedRole.Arn
-    #   clientId: !Ref UserPoolClient
+    ServiceToken: ${self:custom.secrets.CONTACT_FLOW_CR_LAMBDA}
 
 
 dev:

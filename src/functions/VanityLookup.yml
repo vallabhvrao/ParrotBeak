@@ -6,7 +6,7 @@ VanityLookup: &default
   #   - arn:aws:lambda:ap-south-1:483954538571:layer:AwsSdk:10
   environment:
     STAGE: ${self:custom.stage}
-    DB_TABLE_NAME: ${self:custom.secrets.DYNAMODB_NAME}
+    DB_TABLE_NAME:  ${self:custom.secrets.DYNAMODB_NAME}
     S3_DATA_BUCKET: ${self:custom.secrets.S3_DATA_BUCKET}
 
   iamRoleStatements:
@@ -20,8 +20,14 @@ VanityLookup: &default
         - s3:*
       Resource:
         - ${self:custom.secrets.S3_DATA_ARN}
-        - ${self:custom.secrets.S3_DATA_ARN}/*
-        - ${self:custom.secrets.S3_DATA_ARN}/public
+        - !Join
+            - ''
+            - - ${self:custom.secrets.S3_DATA_ARN}
+              - '/*'
+        - !Join
+            - ''
+            - - ${self:custom.secrets.S3_DATA_ARN}
+              - '/public'
     - Effect: Allow
       Action: 
         - lambda:InvokeFunction

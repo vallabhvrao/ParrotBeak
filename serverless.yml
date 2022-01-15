@@ -27,14 +27,17 @@ provider:
   # profile: your-aws-cli-profile
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'eu-west-2'} 
+  lambdaHashingVersion: 20201221
 
   environment:
     NODE_PATH: "./:/opt/node_modules"
+    
 
 
 package:
   exclude:
     - secrets.yml
+    - bucket/**
 ###################################################################################################
 
 
@@ -44,7 +47,7 @@ functions:
 
   GenerateVanityObj: ${file(src/functions/GenerateVanityObj.yml):${self:custom.stage} }
   VanityLookup: ${file(src/functions/VanityLookup.yml):${self:custom.stage} }
-  # ContactFlowPublish: ${file(src/functions/ContactFlowPublish.yml):${self:custom.stage} }
+  ContactFlowPublish: ${file(src/functions/ContactFlowPublish.yml):${self:custom.stage} }
   
 
 ###################################################################################################
@@ -56,6 +59,6 @@ resources:
   Resources:
     DynamoDb: ${file(src/resources/DynamoDb.yml):${self:custom.stage} }
     Assets: ${file(src/resources/Assets.yml):${self:custom.stage} }
-    # CustomResource: ${file(src/resources/CustomResource.yml):${self:custom.stage} }
+    CustomResource: ${file(src/resources/CustomResource.yml):${self:custom.stage} }
               
 ###################################################################################################

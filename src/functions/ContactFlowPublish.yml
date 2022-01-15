@@ -9,9 +9,19 @@ defaults: &default_anchor
       Action: 
         - connect:*
       Resource:
-        - arn:aws:connect:eu-west-2:012700660634:instance/bef6f726-7fce-457f-9083-d8786ac92154
+        - arn:aws:connect:eu-west-2:012700660634:instance/05a49525-75e7-4958-b37e-820eb3a5dd4f/contact-flow/*
+        - arn:aws:connect:eu-west-2:012700660634:instance/05a49525-75e7-4958-b37e-820eb3a5dd4f
+    - Effect: Allow
+      Action: 
+        - s3:*
+      Resource:
+        - ${self:custom.secrets.S3_DATA_ARN}
+
   environment:
     STAGE: ${self:custom.stage}
+    LOOKUP_ARN: ${self:custom.secrets.LOOKUP_ARN}
+    BUCKET: ${self:custom.secrets.S3_DATA_BUCKET}
+    CONNECT_INSTANCE_ID: 05a49525-75e7-4958-b37e-820eb3a5dd4f
 #################################################################
 
 

@@ -71,15 +71,14 @@
 1. install serverless framework. `npm install -g serverless` [for more info](https://www.serverless.com/framework/docs/getting-started)
 2. setup aws cli profile and update it in the serverless.yml file.
 3. run `npm install` from the root of this directory
-4. run `serverless deploy --staging dev` from the root of this directory
-5. run `aws s3 ls --profile your-profile` once the deploy is complete, you should be able to see a bucket created by the name *parrot-beak-dev-assets-xxxxxxxxxxxxx*
-6. go to `secrets.yml` and update the `S3_DATA_BUCKET` attribute with the new bucket name.
-7. redeploy stack by running `serverless deploy --staging dev`
-8. copy files to the bucket `aws s3 sync ./bucket s3://bucket-name --profile your-profile`
-9. invoke the *GenerateVanityObj* lambda `aws lambda invoke --function-name parrot-beak-dev-GenerateVanityObj --profile your-profile ./invoke.txt`
-10. Create an Amazon Connect instance and claim phone number.
-11. Create an empty contact flow. You can find `Vanity-contact-flow.json` in the root of this directory. Use this file to import the contact flow using the import menu.
-12. Update the Lambda ARN in the contact flow to your Lambda ARN
+created by the name *parrot-beak-dev-assets-xxxxxxxxxxxxx*
+4. go to `secrets.yml` and add your [connect instance id](https://aws.amazon.com/premiumsupport/knowledge-center/find-connect-instance-id/) in `CONNECT_INSTANCE_ID` attribute.
+5. run `serverless deploy --staging dev` from the root of this directory
+6. run `aws s3 ls --profile your-profile`. Once the deploy is complete, you should be able to see a bucket created by the name parrot-beak-dev-assets-xxxxxxxxxxxxx keep this handy, you will need it again.
+7. copy files to the bucket `aws s3 sync ./bucket s3://bucket-name --profile your-profile`
+8. invoke the *GenerateVanityObj* lambda `aws lambda invoke --function-name parrot-beak-dev-GenerateVanityObj --profile your-profile ./invoke.txt`
+9. go to your Amazon Connect instance and claim phone number. You should now be able to choose `Vanity-ContactFlow` from the contact flow drop down.
+10. You can now make calls on the number to get vanity number. You can now visit <https://{bucket-name}.s3.{region}.amazonaws.com/public/index.html> to view the last 5 callers.
 
 ## For Assessor
 

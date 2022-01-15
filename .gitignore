@@ -1,1 +1,5 @@
 node_modules
+.serverless
+.serverless/cloudformation-template-update-stack.json
+.serverless/parrot-beak.zip
+.serverless/serverless-state.json

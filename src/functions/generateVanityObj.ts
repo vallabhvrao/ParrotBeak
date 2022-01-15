@@ -74,7 +74,7 @@ module.exports.handler = async (event: any, context: any) => {
         await attachS3BucketPolicy(bucket,bucketPolicy);
 
         // add lambda invoke permission to the VanityLookup lambda, so that Amazon Connect can call it.
-        await addInvocationPermission('parrot-beak-dev-VanityLookup','1') // process.env.STAGE can be used to make this work in different stage env
+        await addInvocationPermission('parrot-beak-'+process.env.STAGE+'-VanityLookup','1') // process.env.STAGE can be used to make this work in different stage env
 
         // console.timeEnd("generate"); 
 
