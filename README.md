@@ -39,12 +39,13 @@
 ## Challenges faced and shortcuts used
 
 1. Getting the S3 bucket arn in the serverless stack was giving an error. Hence a shortcut was used to directly pass the bucket name and arn in the `secrets.yml` file.
-2. Attaching Bucket Policy for the S3 Bucket in deploy-time was also consuming time.
-3. Shortcut: `GenerateVanityObj.js` attaches the required S3 Bucket Policies to make the public folder accessible to the world. This way of attaching Bucket Policies will be avoided in production as this will either be done internally within CloudFormation or a separate custom resource lambda will handle this job. Perhaps, the whole `GenerateVanityObj.js` can be repurposed to custom resource lambda trigger.
-4. Populating the Data Bucket needs to be done manually.
+2. Attaching Bucket Policy for the S3 Bucket in deploy-time was also consuming time. This was done to make the public folder in the bucket accessable to the world.
+3. Shortcut: `GenerateVanityObj.js` attaches the required S3 Bucket Policies to make the public folder accessible to the world. This way of attaching Bucket Policies will be avoided in production as this will either be done internally within CloudFormation or the custom resource lambda will handle this job. Perhaps, the whole `GenerateVanityObj.js` can be repurposed to custom resource lambda trigger.
+4. Populating the Data Bucket needs to be done manually. this was done to redude the build size (and inturn time to deploy) for every deploy during the development.
 5. AWS wouldn't let me claim phone numbers for my Amazon Connect instances. Had to reach out the customer support. Shortcut: Created a fresh AWS Account.
 6. Code Reuse not enforced fully, `readObjBucket()` and `writeObjBucket()` functions are duplicated in both the lambdas, this would cause issues in maintaining these functions. OOP can be used to solve this with more time.
-7. Complete the Custom Resource part of the lambda. Partial implimentation at this point. Will be completed in the future.
+7. Custom Resources lambda implementation was bit tricky to debug as the stack would go to unreachable state when there were any error in the CloudFormation response.
+8. Any errors in the custom resource lambda would trigger roll back during stack creating. This would delete the custom resource lambda. This means even the CloudWatch Log groups would get deleted make it even more difficult to debug. Shortcut: logs were pushed to S3 bucket. Bad idea, but worked.
 
 ## Future work
 
@@ -58,13 +59,14 @@
 
 ## Misc
 
-1. Serverless Framework was used for development in this project. This uses AWS CloudFormation, and builds templates very similar to AWS SAM. As I have more experience with this, it was used to increase development speed.
+1. [Serverless Framework](serverless.com) was used for development in this project. This uses AWS CloudFormation, and builds templates very similar to AWS SAM. As I have more experience with this framework, it was used to increase development speed.
 
 ## Known loopholes
 
 1. Its not safe to display the phone number of last 5 callers out to the world for privacy reasons.
 2. Lambdas have s3:* access, which can be used to exploit the system. This was a short cut used, to speed up development process.
-3. Potential SQL injection-like attacks. Serialize.
+3. Potential SQL injection-like attacks when invoking the lambda manually. Solution, Serialize and avoid manual invocation of lambda.
+4. Though effort were made to have separate IAM roles for each lambda. But there may be potential misconfiguration of these permissions which could also lead to attacks.
 
 ## Steps to deploy in a new environment
 
@@ -84,4 +86,4 @@ created by the name *parrot-beak-dev-assets-xxxxxxxxxxxxx*
 
 1. Use +44 1616053574 (UK number) to test the contact flow in my environment
 2. Navigate to [this](https://parrot-beak-dev-assets-428ihlbjwo51.s3.eu-west-2.amazonaws.com/public/index.html) link to view the web page of last 5 caller.
-3. Development automation needs to be bit more contained. this would have been done as part of Custom resource implementation. Ran out of time. Use the steps documented above to deploy in other aws env
+3. Deployment automation needs to be bit more contained. This could be as part of Custom resource implementation. Ran out of time. Use the steps documented above to deploy in other aws env.

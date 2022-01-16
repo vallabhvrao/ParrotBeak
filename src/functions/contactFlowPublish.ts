@@ -10,6 +10,7 @@ module.exports.handler = async (event:any, context:any) => {
 
 		if (event.RequestType === 'Create' || event.RequestType === 'Update') {
 
+			// Check if the contact flow is already attached
 			let listContactFlowParams = {
 				InstanceId: process.env.CONNECT_INSTANCE_ID, /* required */
 				ContactFlowTypes: ['CONTACT_FLOW']
@@ -22,6 +23,7 @@ module.exports.handler = async (event:any, context:any) => {
 				}				
 			}
 
+			// if the contact flow  is already attached then skip or attach a new one.
 			if(!isContactFlowExist){
 				const params = {
 					Content: "{\"Version\":\"2019-10-30\",\"StartAction\":\"b0f84693-8c33-44ec-9d42-b4ce5c87a3e6\",\"Metadata\":{\"entryPointPosition\":{\"x\":20,\"y\":20},\"snapToGrid\":false,\"ActionMetadata\":{\"15ccc138-c6ac-4967-a926-591505f99967\":{\"position\":{\"x\":615,\"y\":148},\"useDynamic\":true},\"b0f84693-8c33-44ec-9d42-b4ce5c87a3e6\":{\"position\":{\"x\":134,\"y\":180},\"useDynamic\":false},\"85fae6ff-1e37-40ff-b178-312820a736d4\":{\"position\":{\"x\":149,\"y\":360}},\"3751b6f6-c3c8-4f9b-ac99-ecbce6f375a0\":{\"position\":{\"x\":389,\"y\":146},\"dynamicMetadata\":{\"connect\":false},\"useDynamic\":false},\"c626e86c-78e7-4ce3-84ac-9ec27de21d10\":{\"position\":{\"x\":625,\"y\":322},\"useDynamic\":false}}},\"Actions\":[{\"Identifier\":\"15ccc138-c6ac-4967-a926-591505f99967\",\"Parameters\":{\"Text\":\"$.External.tts\"},\"Transitions\":{\"NextAction\":\"85fae6ff-1e37-40ff-b178-312820a736d4\",\"Errors\":[],\"Conditions\":[]},\"Type\":\"MessageParticipant\"},{\"Identifier\":\"b0f84693-8c33-44ec-9d42-b4ce5c87a3e6\",\"Parameters\":{\"Text\":\"Thanks for calling. Please wait while we lookup vanity numbers for the dialed phone number.\"},\"Transitions\":{\"NextAction\":\"3751b6f6-c3c8-4f9b-ac99-ecbce6f375a0\",\"Errors\":[],\"Conditions\":[]},\"Type\":\"MessageParticipant\"},{\"Identifier\":\"85fae6ff-1e37-40ff-b178-312820a736d4\",\"Type\":\"DisconnectParticipant\",\"Parameters\":{},\"Transitions\":{}},{\"Identifier\":\"3751b6f6-c3c8-4f9b-ac99-ecbce6f375a0\",\"Parameters\":{\"LambdaFunctionARN\":\""+process.env.LOOKUP_ARN+"\",\"InvocationTimeLimitSeconds\":\"8\",\"LambdaInvocationAttributes\":{\"connect\":\"true\"}},\"Transitions\":{\"NextAction\":\"15ccc138-c6ac-4967-a926-591505f99967\",\"Errors\":[{\"NextAction\":\"c626e86c-78e7-4ce3-84ac-9ec27de21d10\",\"ErrorType\":\"NoMatchingError\"}],\"Conditions\":[]},\"Type\":\"InvokeLambdaFunction\"},{\"Identifier\":\"c626e86c-78e7-4ce3-84ac-9ec27de21d10\",\"Parameters\":{\"Text\":\"oops, looks like there was an error, we'll get back to you shortly.\"},\"Transitions\":{\"NextAction\":\"85fae6ff-1e37-40ff-b178-312820a736d4\",\"Errors\":[],\"Conditions\":[]},\"Type\":\"MessageParticipant\"}]}", /* required */
