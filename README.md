@@ -1,4 +1,13 @@
 # Phone number to Vanity number
+This Serverless Stack, reads the phone number of the calling phone number and generates a vanity number and speaks the generated vanity number of the calling phone number.
+
+## What is a vanity number?
+A vanity number is a custom phone number that you can construct to spell out a word, phrase, or business name. Some of the examples are: 
+- 1-800-PLUMBER
+- 888-PET-FOOD
+- 843-TAX-TIPS
+
+For more info ref [this](https://voipstudio.com/blog/what-is-a-vanity-number-and-why-you-should-buy-one/#:~:text=A%20vanity%20number%20is%20a,such%20as%20999%20or%201234.) article 
 
 ## Architecture Diagram
 
